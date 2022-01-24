@@ -16,6 +16,7 @@ import spoon.reflect.visitor.filter.TypeFilter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Created by Benjamin DANGLOT
@@ -82,5 +83,9 @@ public class NullifierAmplifier extends AbstractAmplifier<CtExpression<?>> {
     @Override
     protected Set<CtExpression<?>> amplify(CtExpression<?> original, CtMethod<?> testMethod) {
         return Collections.singleton(testMethod.getFactory().createLiteral(null));
+    }
+
+    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
+        return null;
     }
 }

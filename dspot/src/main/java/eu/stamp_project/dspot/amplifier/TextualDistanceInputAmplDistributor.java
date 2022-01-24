@@ -61,6 +61,10 @@ public class TextualDistanceInputAmplDistributor extends AbstractInputAmplDistri
         return reduce(inputAmplifiedTests);
     }
 
+    public List<CtMethod<?>> inputAmplify(List<CtMethod<?>> testMethods, int i, String targetMethodName){
+        return null;
+    }
+
     /**
      * Reduces the number of amplified tests to a practical threshold.
      *

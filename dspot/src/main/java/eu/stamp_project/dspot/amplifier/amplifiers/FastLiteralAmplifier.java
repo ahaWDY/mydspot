@@ -73,6 +73,10 @@ public class FastLiteralAmplifier implements Amplifier {
 		return methods.stream();
 	}
 
+	public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
+		return null;
+	}
+
 	public void reset(CtType testClass) {
 		AmplificationHelper.reset();
 		Set<CtType> codeFragmentsProvide = AmplificationHelper.computeClassProvider(testClass);

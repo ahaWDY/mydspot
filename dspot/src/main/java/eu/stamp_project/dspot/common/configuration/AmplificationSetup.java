@@ -171,6 +171,11 @@ public class AmplificationSetup {
         return selectedToBeAmplified;
     }
 
+    public void createAmplifiedTestClasses(CtType<?> testClassToBeAmplified,List<CtMethod<?>> amplifiedTestMethods){
+        final CtType<?> amplifiedTestClass = this.output.output(testClassToBeAmplified, amplifiedTestMethods);
+        amplifiedTestClasses.add(amplifiedTestClass);
+    }
+
     public List<CtType<?>> getAmplifiedTestClasses(){
         return amplifiedTestClasses;
     }

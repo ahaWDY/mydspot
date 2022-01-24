@@ -7,6 +7,7 @@ import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.factory.Factory;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class CharLiteralAmplifier extends AbstractLiteralAmplifier<Character> {
 
@@ -24,6 +25,10 @@ public class CharLiteralAmplifier extends AbstractLiteralAmplifier<Character> {
             values.add(factory.createLiteral((char) (value - 1)));
         }
         return values;
+    }
+
+    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
+        return null;
     }
 
     @Override

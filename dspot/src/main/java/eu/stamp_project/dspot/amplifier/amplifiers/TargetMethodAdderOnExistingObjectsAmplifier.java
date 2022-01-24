@@ -1,7 +1,7 @@
 package eu.stamp_project.dspot.amplifier.amplifiers;
 
-import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.methodreconstructor.observer.testwithloggenerator.objectlogsyntaxbuilder_constructs.objectlog.MethodsHandler;
 import eu.stamp_project.dspot.amplifier.amplifiers.value.ValueCreatorHelper;
+import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.methodreconstructor.observer.testwithloggenerator.objectlogsyntaxbuilder_constructs.objectlog.MethodsHandler;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
 import eu.stamp_project.dspot.common.miscellaneous.Counter;
 import spoon.reflect.code.CtLocalVariable;
@@ -14,18 +14,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * Created by Benjamin DANGLOT
- * benjamin.danglot@inria.fr
- * on 19/07/18
- */
-@SuppressWarnings("unchecked")
-public class MethodAdderOnExistingObjectsAmplifier implements Amplifier {
+public class TargetMethodAdderOnExistingObjectsAmplifier implements Amplifier {
     @Override
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration) {
+        return null;
+    }
+
+    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
         List<CtLocalVariable<?>> existingObjects = getExistingObjects(testMethod);
         return existingObjects.stream()
-                .flatMap(existingObject -> AmplifierHelper.findMethodsWithTargetType(existingObject.getType()).stream()
+                .flatMap(existingObject -> AmplifierHelper.findTargetMethodWithTargetType(existingObject.getType(), targetMethodName).stream()
                         .filter(ctMethod ->
                                 !MethodsHandler.isASupportedMethodName(ctMethod.getSimpleName())
                                         || (MethodsHandler.isASupportedMethodName(ctMethod.getSimpleName()) && !ctMethod.getParameters().isEmpty())
@@ -40,7 +38,7 @@ public class MethodAdderOnExistingObjectsAmplifier implements Amplifier {
                                         AmplifierHelper.createLocalVarRef(existingObject),
                                         existingObject,
                                         "_mg",
-                                        "MethodAdderOnExistingObjectsAmplifier: added method on existing object")
+                                        "TargetMethodAdderOnExistingObjectsAmplifier: added target method on existing object")
                         ).map(amplifiedTestMethod -> {
                                     Counter.updateInputOf(amplifiedTestMethod, 1);
                                     return amplifiedTestMethod;
@@ -48,10 +46,6 @@ public class MethodAdderOnExistingObjectsAmplifier implements Amplifier {
                         )
                         .collect(Collectors.toList()).stream()
                 );
-    }
-
-    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
-        return null;
     }
 
     private List<CtLocalVariable<?>> getExistingObjects(CtMethod method) {

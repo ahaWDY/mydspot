@@ -71,6 +71,10 @@ public class SimpleInputAmplDistributor extends AbstractInputAmplDistributor {
         return amplifiedTestMethods;
     }
 
+    public List<CtMethod<?>> inputAmplify(List<CtMethod<?>> testMethods, int i, String targetMethodName){
+        return null;
+    }
+
     private Map<Amplifier, Map<CtMethod<?>, List<CtMethod<?>>>> amplify(List<Amplifier> amplifiers,
                                                                         ArrayList<CtMethod<?>> testMethodsToBeAmplified,
                                                                         int iteration) {

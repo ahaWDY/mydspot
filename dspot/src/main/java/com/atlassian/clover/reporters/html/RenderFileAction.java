@@ -30,7 +30,8 @@ import com.atlassian.clover.reporters.json.JSONException;
 import com.atlassian.clover.reporters.json.JSONObject;
 import com.atlassian.clover.reporters.util.CloverChartFactory;
 import com.atlassian.clover.util.CloverUtils;
-import eu.stamp_project.diff_test_selection.clover.CloverReader;
+import eu.stamp_project.dspot.selector.branchcoverageselector.Region;
+import eu.stamp_project.dspot.selector.branchcoverageselector.clover.CloverReader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -142,7 +143,7 @@ public class RenderFileAction implements Callable {
         try {
             insertLineInfos(insertSrcFileProperties(), testLineInfo);
         } catch (Exception e) {
-            Logger.getInstance().error(" Render Invalid Java source found or Clover failed to parse it: " + fileInfo.getPhysicalFile().getAbsolutePath());
+            Logger.getInstance().error("Invalid Java source found or Clover failed to parse it: " + fileInfo.getPhysicalFile().getAbsolutePath());
             velocity.put("filename", fileInfo.getPhysicalFile().getAbsolutePath());
             velocity.put("message", e.getMessage());
             List srclines = SourceRenderHelper.getSrcLines(fileInfo);
@@ -318,44 +319,46 @@ public class RenderFileAction implements Callable {
             final String testClassName = testCaseInfo.getRuntimeTypeName();
             final String testName = testCaseInfo.getTestName();
             JSONObject currentValues = jsonTestTargets.getJSONObject((String) key);
-            if(this.fileInfo.getName().split("\\.")[0].equals("Attribute")){
-                List<? extends BranchInfo> branches = this.fileInfo.getNamedClass("Attribute")
-                    .getAllMethods()
-                    .stream()
-                    .filter(methodInfo -> methodInfo.getSimpleName().equals("setValue"))
-                    .findFirst()
-                    .get()
-                    .getBranches();
-                branches.stream().map(branchInfo -> branchInfo.getTrueHitCount());
-            }
+
+                 this.fileInfo.getNamedClass(this.fileInfo.getName().split("\\.")[0])
+                        .getAllMethods()
+                        .stream()
+                                .forEach(methodInfo -> {
+                                    for (BranchInfo branch : methodInfo.getBranches()) {
+                                        Region region = new Region(branch.getStartLine(), branch.getStartColumn(), branch.getEndLine(), branch.getEndColumn());
+                                        int trueHitCount = branch.getTrueHitCount();
+                                        int falseHitCount = branch.getFalseHitCount();
+                                        CloverReader.coverage.addCoverage(testClassName, testName, this.fileInfo.getName().split("\\.")[0],methodInfo.getName(),region,trueHitCount, falseHitCount);
+                                    }
+                                });
 
 
-            ((List) currentValues.get("statements")).stream()
-                    .map(list -> ((Map) list).get("sl"))
-                    .forEach(line -> {
-                        try {
-                            final int hitCount = this.fileInfo.getNamedClass(this.fileInfo.getName().split("\\.")[0])
-                                    .getAllMethods()
-                                    .stream()
-                                    .flatMap(methodInfo -> methodInfo.getStatements().stream())
-                                    .filter(statementInfo -> statementInfo.getStartLine() == (Integer) line)
-                                    .findFirst()
-                                    .get()
-                                    .getHitCount();
-                            CloverReader.coverage.addCoverage(testClassName, testName, targetClassName, (Integer) line, hitCount);
-                        } catch (Exception e) {
-                            /*e.printStackTrace();*/
-                            final int hitCount = this.fileInfo.getNamedClass(this.fileInfo.getName().split("\\.")[0])
-                                    .getAllMethods()
-                                    .stream()
-                                    .flatMap(methodInfo -> methodInfo.getStatements().stream())
-                                    .filter(statementInfo -> statementInfo.getStartLine() == (Integer) line)
-                                    .findFirst()
-                                    .get()
-                                    .getHitCount();
-                            CloverReader.coverage.addCoverage(testClassName, testName, targetClassName, (Integer) line, hitCount);
-                        }
-                    });
+//            ((List) currentValues.get("statements")).stream()
+//                    .map(list -> ((Map) list).get("sl"))
+//                    .forEach(line -> {
+//                        try {
+//                            final int hitCount = this.fileInfo.getNamedClass(this.fileInfo.getName().split("\\.")[0])
+//                                    .getAllMethods()
+//                                    .stream()
+//                                    .flatMap(methodInfo -> methodInfo.getStatements().stream())
+//                                    .filter(statementInfo -> statementInfo.getStartLine() == (Integer) line)
+//                                    .findFirst()
+//                                    .get()
+//                                    .getHitCount();
+////                            CloverReader.coverage.addCoverage(testClassName, testName, targetClassName, (Integer) line, hitCount);
+//                        } catch (Exception e) {
+//                            /*e.printStackTrace();*/
+//                            final int hitCount = this.fileInfo.getNamedClass(this.fileInfo.getName().split("\\.")[0])
+//                                    .getAllMethods()
+//                                    .stream()
+//                                    .flatMap(methodInfo -> methodInfo.getStatements().stream())
+//                                    .filter(statementInfo -> statementInfo.getStartLine() == (Integer) line)
+//                                    .findFirst()
+//                                    .get()
+//                                    .getHitCount();
+////                            CloverReader.coverage.addCoverage(testClassName, testName, targetClassName, (Integer) line, hitCount);
+//                        }
+//                    });
         }
     }
 

@@ -37,6 +37,10 @@ public class TestMethodCallRemover implements Amplifier {
         }
     }
 
+    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
+        return null;
+    }
+
     @Override
     public void reset(CtType testClass) {
         AmplificationHelper.reset();

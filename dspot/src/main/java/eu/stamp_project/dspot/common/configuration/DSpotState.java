@@ -36,6 +36,8 @@ public class DSpotState {
     private InputAmplDistributor inputAmplDistributor;
     private boolean onlyInputAmplification;
     private boolean devFriendlyAmplification;
+    private String targetMethod;
+    private String targetBranch;
     private Output output;
     private Collector collector;
     private boolean collectData;
@@ -81,6 +83,22 @@ public class DSpotState {
 
     public void setDevFriendlyAmplification(boolean devFriendlyAmplification) {
         this.devFriendlyAmplification = devFriendlyAmplification;
+    }
+
+    public String getTargetMethod(){
+        return targetMethod;
+    }
+
+    public void setTargetMethod(String targetMethod){
+        this.targetMethod = targetMethod;
+    }
+
+    public String getTargetBranch(){
+        return targetBranch;
+    }
+
+    public void setTargetBranch(String targetBranch) {
+        this.targetBranch = targetBranch;
     }
 
     public int getNbIteration() {
