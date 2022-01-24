@@ -1,61 +1,108 @@
 package eu.stamp_project.dspot.selector.branchcoverageselector;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Coverage {
     public void clear() {
-        this.testClassBranchCoverageMap.clear();
+        this.testClassCoverageMap.clear();
     }
 
     public int size() {
-        return this.testClassBranchCoverageMap.size();
+        return this.testClassCoverageMap.size();
     }
 
-    public final Map<String, TestClassBranchCoverage> testClassBranchCoverageMap;
+    private final Map<String, TestClassCoverage> testClassCoverageMap;
+
 
     public Coverage() {
-        this.testClassBranchCoverageMap = new ConcurrentHashMap<>();
+        this.testClassCoverageMap = new ConcurrentHashMap<>();
     }
 
-    public synchronized void addCoverage(String testClassName, String testMethodName, String className, String methodName, Region region, int trueHitCount, int falseHitCount) {
-        if (!this.testClassBranchCoverageMap.containsKey(testClassName)) {
-            this.testClassBranchCoverageMap.put(testClassName, new TestClassBranchCoverage(testClassName));
+    public synchronized void addBranchCoverage(String testClassName, String testMethodName, String className, String methodName, Region region, int trueHitCount, int falseHitCount) {
+        if (!this.testClassCoverageMap.containsKey(testClassName)) {
+            this.testClassCoverageMap.put(testClassName, new TestClassCoverage(testClassName));
         }
-        this.testClassBranchCoverageMap.get(testClassName).addCoverage(testMethodName, className, methodName, region, trueHitCount, falseHitCount);
+        this.testClassCoverageMap.get(testClassName).addBranchCoverage(testMethodName, className, methodName, region, trueHitCount, falseHitCount);
+    }
+
+    public synchronized void addLineCoverage(String testClassName, String testMethodName, String className, String methodName, int line, int hitCount) {
+        if (!this.testClassCoverageMap.containsKey(testClassName)) {
+            this.testClassCoverageMap.put(testClassName, new TestClassCoverage(testClassName));
+        }
+        this.testClassCoverageMap.get(testClassName).addLineCoverage(testMethodName, className, methodName, line, hitCount);
     }
 
     public Set<String> getTestClasses() {
-        return this.testClassBranchCoverageMap.keySet();
+        return this.testClassCoverageMap.keySet();
     }
 
-    public Set<String> getClassesForTestClassAndMethodName(String testClassName, String testMethodName) {
-        return this.testClassBranchCoverageMap.get(testClassName).getClassesForTestMethodName(testMethodName);
+//    public Set<String> getClassesForTestClassAndMethodName(String testClassName, String testMethodName) {
+//        return this.testClassCoverageMap.get(testClassName).getClassesForTestMethodName(testMethodName);
+//    }
+//
+//    public Set<String> getTestMethodsForTestClassName(String testClassName) {
+//        return this.testClassCoverageMap.get(testClassName).getTestMethods();
+//    }
+
+//    public Map<String, MethodCoverage> getCoverageForTestClassTestMethodAndClassName(String testClassName, String testMethodName, String className) {
+//        return this.testClassCoverageMap.get(testClassName).getCoverageForTestMethodAndClassNames(testMethodName, className);
+//    }
+//
+//    public Map<String, ClassCoverage> getTestMethodCoverageForClassName(String testClassName, String testMethodName) {
+//        return this.testClassCoverageMap.get(testClassName).getTestMethodCoverage(testMethodName);
+//    }
+
+    public List<BranchCoverage> getBranchCoverageForTestClassAndClassNameMethodName(String testClassName, String className, String methodName){
+        List<BranchCoverage> result = new ArrayList<>();
+        TestClassCoverage testClassCoverage = testClassCoverageMap.get(testClassName);
+        for(Map.Entry<String, TestMethodCoverage> entry: testClassCoverage.getTestMethodsCoverage().entrySet()){
+            List<BranchCoverage> tmp = entry.getValue().getBranchCoverageForClassAndMethod(className, methodName);
+            if(tmp!=null) {
+                result.addAll(tmp);
+            }
+        }
+        return result;
     }
 
-    public Set<String> getTestMethodsForTestClassName(String testClassName) {
-        return this.testClassBranchCoverageMap.get(testClassName).getTestMethods();
-    }
-
-    public Map<String, MethodBranchCoverage> getCoverageForTestClassTestMethodAndClassName(String testClassName, String testMethodName, String className) {
-        return this.testClassBranchCoverageMap.get(testClassName).getCoverageForTestMethodAndClassNames(testMethodName, className);
-    }
-
-    public Map<String, ClassBranchCoverage> getTestMethodCoverageForClassName(String testClassName, String testMethodName) {
-        return this.testClassBranchCoverageMap.get(testClassName).getTestMethodCoverage(testMethodName);
+    public List<LineCoverage> getLineCoverageForTestClassAndClassNameMethodName(String testClassName, String className, String methodName){
+        List<LineCoverage> result = new ArrayList<>();
+        TestClassCoverage testClassCoverage = testClassCoverageMap.get(testClassName);
+        for(Map.Entry<String, TestMethodCoverage> entry: testClassCoverage.getTestMethodsCoverage().entrySet()){
+            List<LineCoverage> tmp = entry.getValue().getLineCoverageForClassAndMethod(className, methodName);
+            if(tmp!=null) {
+                result.addAll(tmp);
+            }
+        }
+        return result;
     }
 
     public List<BranchCoverage> getBranchCoverageForTestClassTestMethodAndClassNameMethodName(String testClassName, String testMethodName, String className, String methodName){
-        return this.testClassBranchCoverageMap.get(testClassName).getCoverageForTestMethodAndClassNames(testMethodName,className).get(methodName).getCoverages();
+        if(!testClassCoverageMap.containsKey(testClassName)){
+            return null;
+        }
+        TestMethodCoverage testMethodCoverage =  this.testClassCoverageMap.get(testClassName).getTestMethodCoverage(testMethodName);
+        if(testMethodCoverage!=null) {
+            return testMethodCoverage.getBranchCoverageForClassAndMethod(className, methodName);
+        }
+        return null;
+    }
+
+    public List<LineCoverage> getLineCoverageForTestClassTestMethodAndClassNameMethodName(String testClassName, String testMethodName, String className, String methodName){
+        if(!testClassCoverageMap.containsKey(testClassName)){
+            return null;
+        }
+        TestMethodCoverage testMethodCoverage =  this.testClassCoverageMap.get(testClassName).getTestMethodCoverage(testMethodName);
+        if(testMethodCoverage!=null) {
+           return testMethodCoverage.getLineCoverageForClassAndMethod(className, methodName);
+        }
+        return null;
     }
 
     @Override
     public String toString() {
         return "Coverage{" +
-                "testClassCoverage=" + testClassBranchCoverageMap.toString() +
+                "testClassCoverage=" + testClassCoverageMap.toString() +
                 '}';
     }
 }

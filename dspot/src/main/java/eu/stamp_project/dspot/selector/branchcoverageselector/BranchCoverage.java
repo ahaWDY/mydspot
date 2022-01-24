@@ -1,11 +1,11 @@
 package eu.stamp_project.dspot.selector.branchcoverageselector;
 
 public class BranchCoverage {
-    public Region region;
+    private Region region;
 
-    public final int trueHitCount;
+    private final int trueHitCount;
 
-    public final int falseHitCount;
+    private final int falseHitCount;
 
     public BranchCoverage(Region region, int trueHitCount, int falseHitCount) {
         this.region = region;

@@ -1,13 +1,13 @@
 package eu.stamp_project.dspot.selector.branchcoverageselector;
 
 public class Region {
-    public final int startLine;
+    private final int startLine;
 
-    public final int startColumn;
+    private final int startColumn;
 
-    public final int endLine;
+    private final int endLine;
 
-    public final int endColumn;
+    private final int endColumn;
 
     public Region(int startLine, int startColumn, int endLine, int endColumn){
         this.startLine = startLine;
@@ -15,6 +15,11 @@ public class Region {
         this.endLine = endLine;
         this.endColumn = endColumn;
     }
+
+    public int getStartLine() {
+        return startLine;
+    }
+
     @Override
     public String toString() {
         return "Region{" + startLine + ","+startColumn+","+endLine+","+endColumn+ "}";
