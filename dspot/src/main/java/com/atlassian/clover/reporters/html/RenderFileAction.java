@@ -10,9 +10,7 @@ import com.atlassian.clover.api.registry.ClassInfo;
 import com.atlassian.clover.api.registry.MethodInfo;
 import com.atlassian.clover.api.registry.SourceInfo;
 import com.atlassian.clover.api.registry.StatementInfo;
-import com.atlassian.clover.registry.entities.FullFileInfo;
-import com.atlassian.clover.registry.entities.FullPackageInfo;
-import com.atlassian.clover.registry.entities.FullProjectInfo;
+import com.atlassian.clover.registry.entities.*;
 import com.atlassian.clover.registry.util.EntityVisitorUtils;
 import com.atlassian.clover.reporters.Column;
 import com.atlassian.clover.reporters.Current;
@@ -25,7 +23,6 @@ import com.atlassian.clover.context.ContextSet;
 import com.atlassian.clover.api.registry.ElementInfo;
 import com.atlassian.clover.registry.FileElementVisitor;
 import com.atlassian.clover.registry.metrics.HasMetricsFilter;
-import com.atlassian.clover.registry.entities.TestCaseInfo;
 import com.atlassian.clover.reporters.json.JSONException;
 import com.atlassian.clover.reporters.json.JSONObject;
 import com.atlassian.clover.reporters.util.CloverChartFactory;
@@ -195,6 +192,8 @@ public class RenderFileAction implements Callable {
 
         final List<TestCaseInfo>[] testLineInfo = (List<TestCaseInfo>[]) new ArrayList[fcopy.getLineCount() + 1];
 
+        String className = this.fileInfo.getName().split("\\.")[0];
+
         for (final TestCaseInfo tci : testHits) {
             testSet.clear();
             testSet.add(tci);
@@ -203,6 +202,9 @@ public class RenderFileAction implements Callable {
             fcopy.setDataProvider(new BitSetCoverageProvider(data.getHitsFor(testSet, fcopy), data));
 
             testMetrics.put(tci, fcopy.getMetrics());
+
+            final String testClassName = tci.getClassName();
+            final String testName = tci.getTestName();
 
             fcopy.visitElements(new FileElementVisitor() {
                 @Override
@@ -225,11 +227,25 @@ public class RenderFileAction implements Callable {
 
                 @Override
                 public void visitStatement(StatementInfo info) {
+                    int hitCount = info.getHitCount();
+                    if(hitCount>0){
+                        FullMethodInfo methodInfo = (FullMethodInfo) info.getParent();
+                        String methodName = methodInfo.getName();
+                        CloverReader.coverage.addLineCoverage(testClassName, testName, className, methodName, info.getStartLine(), hitCount);
+                    }
                     visitNode(info);
                 }
 
                 @Override
                 public void visitBranch(BranchInfo info) {
+                    int trueHitCount = info.getTrueHitCount();
+                    int falseHitCount = info.getFalseHitCount();
+                    if(trueHitCount>0 || falseHitCount>0) {
+                        FullMethodInfo methodInfo = (FullMethodInfo) info.getParent();
+                        String methodName = methodInfo.getName();
+                        Region region = new Region(info.getStartLine(), info.getStartColumn(), info.getEndLine(), info.getEndColumn());
+                        CloverReader.coverage.addBranchCoverage(testClassName, testName, className,methodName,region,trueHitCount, falseHitCount);
+                    }
                     visitNode(info);
                 }
 
@@ -319,7 +335,7 @@ public class RenderFileAction implements Callable {
 //            final String testClassName = testCaseInfo.getRuntimeTypeName();
 //            final String testName = testCaseInfo.getTestName();
 //            JSONObject currentValues = jsonTestTargets.getJSONObject((String) key);
-
+//
 //                 this.fileInfo.getNamedClass(this.fileInfo.getName().split("\\.")[0])
 //                        .getAllMethods()
 //                        .stream()
@@ -328,37 +344,17 @@ public class RenderFileAction implements Callable {
 //                                        Region region = new Region(branch.getStartLine(), branch.getStartColumn(), branch.getEndLine(), branch.getEndColumn());
 //                                        int trueHitCount = branch.getTrueHitCount();
 //                                        int falseHitCount = branch.getFalseHitCount();
-//                                        CloverReader.coverage.addCoverage(testClassName, testName, this.fileInfo.getName().split("\\.")[0],methodInfo.getName(),region,trueHitCount, falseHitCount);
+//                                        CloverReader.coverage.addBranchCoverage(testClassName, testName, this.fileInfo.getName().split("\\.")[0],methodInfo.getSimpleName(),region,trueHitCount, falseHitCount);
+//                                    }
+//                                    for(StatementInfo statement: methodInfo.getStatements()){
+//                                        int hitCount = statement.getHitCount();
+//                                        if(hitCount>0){
+//                                            for(int sl = statement.getStartLine(); sl<=statement.getEndLine(); sl++){
+//                                                CloverReader.coverage.addLineCoverage(testClassName, testName, this.fileInfo.getName().split("\\.")[0], methodInfo.getName(), sl, hitCount);
+//                                            }
+//                                        }
 //                                    }
 //                                });
-
-
-//            ((List) currentValues.get("statements")).stream()
-//                    .map(list -> ((Map) list).get("sl"))
-//                    .forEach(line -> {
-//                        try {
-//                            final int hitCount = this.fileInfo.getNamedClass(this.fileInfo.getName().split("\\.")[0])
-//                                    .getAllMethods()
-//                                    .stream()
-//                                    .flatMap(methodInfo -> methodInfo.getStatements().stream())
-//                                    .filter(statementInfo -> statementInfo.getStartLine() == (Integer) line)
-//                                    .findFirst()
-//                                    .get()
-//                                    .getHitCount();
-////                            CloverReader.coverage.addCoverage(testClassName, testName, targetClassName, (Integer) line, hitCount);
-//                        } catch (Exception e) {
-//                            /*e.printStackTrace();*/
-//                            final int hitCount = this.fileInfo.getNamedClass(this.fileInfo.getName().split("\\.")[0])
-//                                    .getAllMethods()
-//                                    .stream()
-//                                    .flatMap(methodInfo -> methodInfo.getStatements().stream())
-//                                    .filter(statementInfo -> statementInfo.getStartLine() == (Integer) line)
-//                                    .findFirst()
-//                                    .get()
-//                                    .getHitCount();
-////                            CloverReader.coverage.addCoverage(testClassName, testName, targetClassName, (Integer) line, hitCount);
-//                        }
-//                    });
 //        }
 //    }
 
