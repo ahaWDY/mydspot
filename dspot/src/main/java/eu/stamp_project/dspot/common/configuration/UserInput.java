@@ -173,6 +173,14 @@ public class UserInput {
     private boolean devFriendlyAmplification;
 
     @CommandLine.Option(
+            names = {"--target-class"},
+            defaultValue = "",
+            description = "Specify the class to test." +
+                    "By default, DSpot does not consider target class."
+    )
+    private String targetClass = "";
+
+    @CommandLine.Option(
             names = {"--method", "--target-method"},
             defaultValue = "",
             description = "Specify the method to test." +
@@ -638,6 +646,15 @@ public class UserInput {
 
     public UserInput setDevFriendlyAmplification(boolean devFriendlyAmplification) {
         this.devFriendlyAmplification = devFriendlyAmplification;
+        return this;
+    }
+
+    public String getTargetClass() {
+        return targetClass;
+    }
+
+    public UserInput setTargetClass(String targetClass) {
+        this.targetClass = targetClass;
         return this;
     }
 

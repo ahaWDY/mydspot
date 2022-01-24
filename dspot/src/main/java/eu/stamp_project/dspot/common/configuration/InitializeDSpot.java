@@ -41,6 +41,7 @@ public class InitializeDSpot {
         DSpotState.setDevFriendlyAmplification(userInput.isDevFriendlyAmplification());
         DSpotState.setTargetMethod(userInput.getTargetMethod());
         DSpotState.setTargetBranch(userInput.getTargetBranch());
+        DSpotState.setTargetClass(userInput.getTargetClass());
         DSpotState.verbose = userInput.isVerbose();
         DSpotState.setStartTime(System.currentTimeMillis());
         DSpotState.setTestFinder(new TestFinder(

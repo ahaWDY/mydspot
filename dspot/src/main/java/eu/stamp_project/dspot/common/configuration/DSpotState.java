@@ -36,6 +36,7 @@ public class DSpotState {
     private InputAmplDistributor inputAmplDistributor;
     private boolean onlyInputAmplification;
     private boolean devFriendlyAmplification;
+    private String targetClass;
     private String targetMethod;
     private String targetBranch;
     private Output output;
@@ -83,6 +84,14 @@ public class DSpotState {
 
     public void setDevFriendlyAmplification(boolean devFriendlyAmplification) {
         this.devFriendlyAmplification = devFriendlyAmplification;
+    }
+
+    public String getTargetClass() {
+        return targetClass;
+    }
+
+    public void setTargetClass(String targetClass) {
+        this.targetClass = targetClass;
     }
 
     public String getTargetMethod(){

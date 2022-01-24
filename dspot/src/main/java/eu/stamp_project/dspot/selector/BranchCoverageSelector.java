@@ -50,8 +50,8 @@ public class BranchCoverageSelector extends TakeAllSelector {
         super(automaticBuilder, configuration);
         this.absolutePathToProjectRoot = configuration.getAbsolutePathToProjectRoot();
         this.absolutePathToTestSourceCode = configuration.getAbsolutePathToTestSourceCode();
-//        String[] classAddress = configuration.getTargetClass().split("\\.");
-//        this.targetClass = classAddress[classAddress.length-1];
+        String[] classAddress = configuration.getTargetClass().split("\\.");
+        this.targetClass = classAddress[classAddress.length-1];
         this.targetMethod = configuration.getTargetMethod();
         this.targetBranch = configuration.getTargetBranch();
 
