@@ -7,14 +7,14 @@ import eu.stamp_project.dspot.selector.extendedcoverageselector.ExtendedCoverage
 
 import java.util.List;
 
-public class TestCaseJSON {
+public class TestCaseBranchCoverageJSON {
     private final String name;
     private final int nbAssertionAdded;
     private final int nbInputAdded;
     private final List<BranchCoverage> branchCoverageList;
     private final List<LineCoverage> lineCoverageList;
 
-    public TestCaseJSON(String name, int nbAssertionAdded, int nbInputAdded, List<BranchCoverage> branchCoverageList, List<LineCoverage> lineCoverageList) {
+    public TestCaseBranchCoverageJSON(String name, int nbAssertionAdded, int nbInputAdded, List<BranchCoverage> branchCoverageList, List<LineCoverage> lineCoverageList) {
         this.name = name;
         this.nbAssertionAdded = nbAssertionAdded;
         this.nbInputAdded = nbInputAdded;

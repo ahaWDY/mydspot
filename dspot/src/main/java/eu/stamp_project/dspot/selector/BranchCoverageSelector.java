@@ -9,13 +9,14 @@ import eu.stamp_project.dspot.common.miscellaneous.Counter;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import eu.stamp_project.dspot.common.report.output.selector.TestSelectorElementReport;
 import eu.stamp_project.dspot.common.report.output.selector.TestSelectorElementReportImpl;
-import eu.stamp_project.dspot.common.report.output.selector.branchcoverage.json.TestCaseJSON;
-import eu.stamp_project.dspot.common.report.output.selector.branchcoverage.json.TestClassJSON;
+import eu.stamp_project.dspot.common.report.output.selector.branchcoverage.json.TestCaseBranchCoverageJSON;
+import eu.stamp_project.dspot.common.report.output.selector.branchcoverage.json.TestClassBranchCoverageJSON;
 import eu.stamp_project.dspot.selector.branchcoverageselector.BranchCoverage;
 import eu.stamp_project.dspot.selector.branchcoverageselector.Coverage;
 import eu.stamp_project.dspot.selector.branchcoverageselector.LineCoverage;
 import eu.stamp_project.dspot.selector.branchcoverageselector.clover.CloverExecutor;
 import eu.stamp_project.dspot.selector.branchcoverageselector.clover.CloverReader;
+import eu.stamp_project.dspot.selector.extendedcoverageselector.ExtendedCoverage;
 import eu.stamp_project.testrunner.EntryPoint;
 import eu.stamp_project.testrunner.listener.CoveragePerTestMethod;
 import spoon.reflect.code.CtComment;
@@ -29,7 +30,6 @@ import java.util.*;
 import java.util.concurrent.TimeoutException;
 
 public class BranchCoverageSelector extends TakeAllSelector {
-    // for branchcoverageselector
     protected String absolutePathToProjectRoot;
     protected String absolutePathToTestSourceCode;
     protected String targetClass;
@@ -45,6 +45,8 @@ public class BranchCoverageSelector extends TakeAllSelector {
     Map<CtMethod<?>, List<BranchCoverage>> branchCoveragePerTestCase;
 
     Map<CtMethod<?>, List<LineCoverage>> lineCoveragePerPerTestCase;
+
+    ExtendedCoverage initialCoverage2;
 
     public BranchCoverageSelector(AutomaticBuilder automaticBuilder, UserInput configuration) {
         super(automaticBuilder, configuration);
@@ -67,6 +69,8 @@ public class BranchCoverageSelector extends TakeAllSelector {
         new CloverExecutor().instrumentAndRunGivenTestClass(absolutePathToProjectRoot, currentClassTestToBeAmplified.getQualifiedName());
         Coverage result = new CloverReader().read(absolutePathToProjectRoot);
         this.initialCoverage = result;
+//        System.out.println("result: "+result);
+//        System.out.println(testClassName +" " +targetClass +" " +targetMethod);
         this.initialBranchCoverage = result.getBranchCoverageForTestClassAndClassNameMethodName(testClassName, targetClass, targetMethod);
         this.initialLineCoverage = result.getLineCoverageForTestClassAndClassNameMethodName(testClassName, targetClass, targetMethod);
         return testsToBeAmplified;
@@ -99,6 +103,7 @@ public class BranchCoverageSelector extends TakeAllSelector {
                     if (!(lineCoverageList==null)){
                         methodsKept.add(ctMethod);
                         lineCoveragePerPerTestCase.put(ctMethod, lineCoverageList);
+                        branchCoveragePerTestCase.put(ctMethod, result.getBranchCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod));
                     }
             }
         }
@@ -132,12 +137,12 @@ public class BranchCoverageSelector extends TakeAllSelector {
         return new TestSelectorElementReportImpl(report, jsonReport(), Collections.emptyList(), "");
     }
 
-    private TestClassJSON jsonReport() {
-        TestClassJSON testClassJSON;
-        testClassJSON = new TestClassJSON(this.initialBranchCoverage, this.initialLineCoverage, this.branchCoveragePerTestCase,
+    private TestClassBranchCoverageJSON jsonReport() {
+        TestClassBranchCoverageJSON testClassJSON;
+        testClassJSON = new TestClassBranchCoverageJSON(this.initialBranchCoverage, this.initialLineCoverage, this.branchCoveragePerTestCase,
                 this.lineCoveragePerPerTestCase);
         this.selectedAmplifiedTest.stream()
-                .map(ctMethod -> new TestCaseJSON(ctMethod.getSimpleName(),
+                .map(ctMethod -> new TestCaseBranchCoverageJSON(ctMethod.getSimpleName(),
                         Counter.getAssertionOfSinceOrigin(ctMethod),
                         Counter.getInputOfSinceOrigin(ctMethod),
                         this.branchCoveragePerTestCase.get(ctMethod),

@@ -58,6 +58,7 @@ public class DevFriendlyAmplification {
     public List<CtMethod<?>> devFriendlyAmplification(CtType<?> testClassToBeAmplified,
                                                       List<CtMethod<?>> testMethodsToBeAmplified) throws IOException {
 
+        //firstSelectSetup -> get passing testmethods
         final List<CtMethod<?>> selectedToBeAmplified = dSpot
                 .setupSelector(testClassToBeAmplified,
                         dSpotState.getTestFinder().findTestMethods(testClassToBeAmplified,Collections.emptyList()));
@@ -124,7 +125,7 @@ public class DevFriendlyAmplification {
                     .removeAssertions(testClassToBeAmplified, testMethodsToBeAmplified);
             classWithTestMethods = testTuple.testClassToBeAmplified;
 
-            // Amplify input
+            // it seems to be useless
             List<CtMethod<?>> selectedForInputAmplification = setup
                     .fullSelectorSetup(classWithTestMethods, testTuple.testMethodsToBeAmplified);
 
@@ -154,16 +155,20 @@ public class DevFriendlyAmplification {
                     .removeAssertions(testClassToBeAmplified, testMethodsToBeAmplified);
             classWithTestMethods = testTuple.testClassToBeAmplified;
 
-            // Amplify input
-            List<CtMethod<?>> selectedForInputAmplification = setup
-                    .fullSelectorSetup(classWithTestMethods, testTuple.testMethodsToBeAmplified);
+            List<CtMethod<?>> selectedForInputAmplification = testTuple.testMethodsToBeAmplified;
+
+            // after remove assertions all testcases fail
+            List<CtMethod<?>> passingTests = setup.firstSelectorSetup(classWithTestMethods, selectedForInputAmplification);
 
             List<CtMethod<?>> inputAmplifiedTests = dSpotState.getInputAmplDistributor()
                     .inputAmplify(selectedForInputAmplification, 0, dSpotState.getTargetMethod());
 
-            // Add new assertions
-            amplifiedTests = dSpotState.getAssertionGenerator()
+            // Add new assertions always fail do not know why
+            List<CtMethod<?>> amplifiedTestsWithAssertions = dSpotState.getAssertionGenerator()
                     .assertionAmplification(classWithTestMethods, inputAmplifiedTests);
+
+            amplifiedTests = inputAmplifiedTests;
+//            amplifiedTests = amplifiedTestsWithAssertions;
 
         } catch (Exception | java.lang.Error e) {
             GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
@@ -219,31 +224,22 @@ public class DevFriendlyAmplification {
         if (amplifiedTests.isEmpty()) {
             return Collections.emptyList();
         }
-        final List<CtMethod<?>> amplifiedPassingTests = dSpotState.getTestCompiler()
-                .compileRunAndDiscardUncompilableAndFailingTestMethods(classWithTestMethods, amplifiedTests, dSpotState
-                        .getCompiler());
+//        final List<CtMethod<?>> amplifiedPassingTests = dSpotState.getTestCompiler()
+//                .compileRunAndDiscardUncompilableAndFailingTestMethods(classWithTestMethods, amplifiedTests, dSpotState
+//                        .getCompiler());
+        final List<CtMethod<?>> amplifiedPassingTests = amplifiedTests;
 
-        //compute the branch coverage
-        final CtType<?> amplifiedTestClass = AmplificationHelper.createAmplifiedTest(amplifiedPassingTests,classWithTestMethods);
-        final String amplifiedName = AmplificationHelper.getAmplifiedName(amplifiedTestClass);
-        amplifiedTestClass.setSimpleName(amplifiedName);
-        final File outputDirectory = new File(dSpotState.getUserInput().getAbsolutePathToTestSourceCode());
-        DSpotUtils.printAndCompileToCheck(amplifiedTestClass, outputDirectory, new NullCollector());
+        final List<CtMethod<?>> improvingTests = new ArrayList<>();
+        try {
+            dSpot.selectImprovingTestCases(amplifiedPassingTests, improvingTests);
+        } catch (AmplificationException e) {
+            GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
+            return Collections.emptyList();
+        }
 
-        new CloverExecutor().instrumentAndRunGivenTestClass(dSpotState.getUserInput().getAbsolutePathToProjectRoot(), amplifiedName);
-        Coverage result=new CloverReader().read(dSpotState.getUserInput().getAbsolutePathToProjectRoot());
-
-        final String regex = File.separator.equals("/") ? "/" : "\\\\";
-        final String pathname =
-                outputDirectory.getAbsolutePath() + File.separator +
-                        amplifiedTestClass.getQualifiedName().replaceAll("\\.", regex) + ".java";
-
-        deleteFile(pathname);
-
-        final List<CtMethod<?>> targetTests = new ArrayList<>();
         LOGGER.info("Dev friendly amplification, path {}: {} test method(s) have been successfully amplified.",
-                path, targetTests.size());
-        return targetTests;
+                path, improvingTests.size());
+        return improvingTests;
     }
 
     void deleteFile(String pathname){

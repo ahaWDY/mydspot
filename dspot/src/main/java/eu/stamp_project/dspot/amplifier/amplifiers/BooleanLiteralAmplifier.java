@@ -24,7 +24,7 @@ public class BooleanLiteralAmplifier extends AbstractLiteralAmplifier<Boolean> {
     }
 
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
-        return null;
+        return amplify(testMethod, iteration);
     }
 
     @Override

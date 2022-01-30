@@ -51,7 +51,7 @@ public class MethodAdderOnExistingObjectsAmplifier implements Amplifier {
     }
 
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
-        return null;
+        return amplify(testMethod, iteration);
     }
 
     private List<CtLocalVariable<?>> getExistingObjects(CtMethod method) {

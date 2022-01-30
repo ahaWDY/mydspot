@@ -34,7 +34,7 @@ public class MethodDuplicationAmplifier implements Amplifier {
     }
 
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
-        return null;
+        return amplify(testMethod, iteration);
     }
 
     @Override

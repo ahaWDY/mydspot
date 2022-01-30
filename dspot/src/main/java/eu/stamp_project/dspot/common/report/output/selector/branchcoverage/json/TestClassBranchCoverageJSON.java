@@ -10,17 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class TestClassJSON implements eu.stamp_project.dspot.common.report.output.selector.TestClassJSON {
+public class TestClassBranchCoverageJSON implements eu.stamp_project.dspot.common.report.output.selector.TestClassJSON {
 
 
-    private List<TestCaseJSON> testCases;
+    private List<TestCaseBranchCoverageJSON> testCases;
 //    private final Coverage initialCoverage;
     List<BranchCoverage> initialBranchCoverage;
     List<LineCoverage> initialLineCoverage;
 //    Map<CtMethod<?>, List<BranchCoverage>> branchCoveragePerTestCase;
 //    Map<CtMethod<?>, List<LineCoverage>> lineCoveragePerPerTestCase;
 
-    public TestClassJSON(List<BranchCoverage> initialBranchCoverage, List<LineCoverage> initialLineCoverage, Map<CtMethod<?>, List<BranchCoverage>> branchCoveragePerTestCase,
+    public TestClassBranchCoverageJSON(List<BranchCoverage> initialBranchCoverage, List<LineCoverage> initialLineCoverage, Map<CtMethod<?>, List<BranchCoverage>> branchCoveragePerTestCase,
             Map<CtMethod<?>, List<LineCoverage>> lineCoveragePerPerTestCase) {
         this.initialBranchCoverage = initialBranchCoverage;
         this.initialLineCoverage = initialLineCoverage;
@@ -28,14 +28,14 @@ public class TestClassJSON implements eu.stamp_project.dspot.common.report.outpu
 //        this.lineCoveragePerPerTestCase = lineCoveragePerPerTestCase;
     }
 
-    public boolean addTestCase(TestCaseJSON testCaseJSON) {
+    public boolean addTestCase(TestCaseBranchCoverageJSON testCaseJSON) {
         if (this.testCases == null) {
             this.testCases = new ArrayList<>();
         }
         return this.testCases.add(testCaseJSON);
     }
 
-    public List<TestCaseJSON> getTestCases() {
+    public List<TestCaseBranchCoverageJSON> getTestCases() {
         return this.testCases;
     }
 
