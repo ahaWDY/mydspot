@@ -73,6 +73,7 @@ public class BranchCoverageSelector extends TakeAllSelector {
 //        System.out.println(testClassName +" " +targetClass +" " +targetMethod);
         this.initialBranchCoverage = result.getBranchCoverageForTestClassAndClassNameMethodName(testClassName, targetClass, targetMethod);
         this.initialLineCoverage = result.getLineCoverageForTestClassAndClassNameMethodName(testClassName, targetClass, targetMethod);
+        new CloverExecutor().runMavenClean(absolutePathToProjectRoot);
         return testsToBeAmplified;
     }
 

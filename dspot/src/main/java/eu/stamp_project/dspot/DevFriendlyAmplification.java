@@ -154,21 +154,19 @@ public class DevFriendlyAmplification {
             testTuple = dSpotState.getAssertionGenerator()
                     .removeAssertions(testClassToBeAmplified, testMethodsToBeAmplified);
             classWithTestMethods = testTuple.testClassToBeAmplified;
-
             List<CtMethod<?>> selectedForInputAmplification = testTuple.testMethodsToBeAmplified;
 
-            // after remove assertions all testcases fail
-            List<CtMethod<?>> passingTests = setup.firstSelectorSetup(classWithTestMethods, selectedForInputAmplification);
-
+            // amplify
             List<CtMethod<?>> inputAmplifiedTests = dSpotState.getInputAmplDistributor()
                     .inputAmplify(selectedForInputAmplification, 0, dSpotState.getTargetMethod());
 
-            // Add new assertions always fail do not know why
+            // Add new assertions
             List<CtMethod<?>> amplifiedTestsWithAssertions = dSpotState.getAssertionGenerator()
                     .assertionAmplification(classWithTestMethods, inputAmplifiedTests);
 
-            amplifiedTests = inputAmplifiedTests;
-//            amplifiedTests = amplifiedTestsWithAssertions;
+            amplifiedTests = amplifiedTestsWithAssertions;
+            // add those without assertions (what if we do not have)
+//            amplifiedTests.addAll(inputAmplifiedTests);
 
         } catch (Exception | java.lang.Error e) {
             GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
@@ -240,11 +238,6 @@ public class DevFriendlyAmplification {
         LOGGER.info("Dev friendly amplification, path {}: {} test method(s) have been successfully amplified.",
                 path, improvingTests.size());
         return improvingTests;
-    }
-
-    void deleteFile(String pathname){
-        File file = new File(pathname);
-        file.delete();
     }
 
 }

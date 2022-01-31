@@ -97,6 +97,14 @@ public class CloverExecutor {
         );
     }
 
+    public void runMavenClean(String pathToRootOfProject){
+        setMavenHome();
+        runGoals(
+                pathToRootOfProject,
+                "compile"
+        );
+    }
+
 
     private int runGoals(String pathToRootOfProject, String... goals) {
         InvocationRequest request = new DefaultInvocationRequest();
