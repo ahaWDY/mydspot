@@ -17,15 +17,10 @@ public class TestClassBranchCoverageJSON implements eu.stamp_project.dspot.commo
 //    private final Coverage initialCoverage;
     List<BranchCoverage> initialBranchCoverage;
     List<LineCoverage> initialLineCoverage;
-//    Map<CtMethod<?>, List<BranchCoverage>> branchCoveragePerTestCase;
-//    Map<CtMethod<?>, List<LineCoverage>> lineCoveragePerPerTestCase;
 
-    public TestClassBranchCoverageJSON(List<BranchCoverage> initialBranchCoverage, List<LineCoverage> initialLineCoverage, Map<CtMethod<?>, List<BranchCoverage>> branchCoveragePerTestCase,
-            Map<CtMethod<?>, List<LineCoverage>> lineCoveragePerPerTestCase) {
+    public TestClassBranchCoverageJSON(List<BranchCoverage> initialBranchCoverage, List<LineCoverage> initialLineCoverage) {
         this.initialBranchCoverage = initialBranchCoverage;
         this.initialLineCoverage = initialLineCoverage;
-//        this.branchCoveragePerTestCase = branchCoveragePerTestCase;
-//        this.lineCoveragePerPerTestCase = lineCoveragePerPerTestCase;
     }
 
     public boolean addTestCase(TestCaseBranchCoverageJSON testCaseJSON) {
@@ -39,9 +34,6 @@ public class TestClassBranchCoverageJSON implements eu.stamp_project.dspot.commo
         return this.testCases;
     }
 
-//    public Coverage getInitialCoverage() {
-//        return initialCoverage;
-//    }
 
 
     public List<BranchCoverage> getInitialBranchCoverage() {
@@ -51,12 +43,4 @@ public class TestClassBranchCoverageJSON implements eu.stamp_project.dspot.commo
     public List<LineCoverage> getInitialLineCoverage() {
         return initialLineCoverage;
     }
-
-//    public Map<CtMethod<?>, List<BranchCoverage>> getBranchCoveragePerTestCase() {
-//        return branchCoveragePerTestCase;
-//    }
-//
-//    public Map<CtMethod<?>, List<LineCoverage>> getLineCoveragePerPerTestCase() {
-//        return lineCoveragePerPerTestCase;
-//    }
 }

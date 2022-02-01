@@ -72,7 +72,7 @@ public class DevFriendlyAmplification {
             amplifiedTestMethodsToKeep.addAll(ampRemoveAssertionsAddNewOnes(testClassToBeAmplified, methodsToAmplify));
             amplifiedTestMethodsToKeep.addAll(inputAmplification(testClassToBeAmplified, methodsToAmplify));
         }
-        else if(!dSpotState.getTargetBranch().equals("")){
+        else if (!dSpotState.getTargetBranch().equals("")){
             amplifiedTestMethodsToKeep.addAll(targetMethodAmplification(testClassToBeAmplified, methodsToAmplify));
         }
         return amplifiedTestMethodsToKeep;
@@ -148,6 +148,7 @@ public class DevFriendlyAmplification {
                                                        List<CtMethod<?>> testMethodsToBeAmplified) throws IOException {
         final List<CtMethod<?>> amplifiedTests;
         final CtType<?> classWithTestMethods;
+//       add iteration here
         try {
             TestTuple testTuple;
             // Remove old assertions
@@ -222,10 +223,9 @@ public class DevFriendlyAmplification {
         if (amplifiedTests.isEmpty()) {
             return Collections.emptyList();
         }
-//        final List<CtMethod<?>> amplifiedPassingTests = dSpotState.getTestCompiler()
-//                .compileRunAndDiscardUncompilableAndFailingTestMethods(classWithTestMethods, amplifiedTests, dSpotState
-//                        .getCompiler());
-        final List<CtMethod<?>> amplifiedPassingTests = amplifiedTests;
+        final List<CtMethod<?>> amplifiedPassingTests = dSpotState.getTestCompiler()
+                .compileRunAndDiscardUncompilableAndFailingTestMethods(classWithTestMethods, amplifiedTests, dSpotState
+                        .getCompiler());
 
         final List<CtMethod<?>> improvingTests = new ArrayList<>();
         try {

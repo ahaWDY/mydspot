@@ -64,17 +64,20 @@ public class BranchCoverageSelector extends TakeAllSelector {
     @Override
     public List<CtMethod<?>> selectToAmplify(CtType<?> classTest, List<CtMethod<?>> testsToBeAmplified) {
         this.currentClassTestToBeAmplified = classTest;
+        if(targetBranch.equals("")){
+            computeInitialCoverage(classTest);
+        }
+        return testsToBeAmplified;
+    }
+
+    private void computeInitialCoverage(CtType<?> classTest){
         // calculate existing coverage of the whole test suite
         String testClassName = currentClassTestToBeAmplified.getSimpleName();
         new CloverExecutor().instrumentAndRunGivenTestClass(absolutePathToProjectRoot, currentClassTestToBeAmplified.getQualifiedName());
         Coverage result = new CloverReader().read(absolutePathToProjectRoot);
         this.initialCoverage = result;
-//        System.out.println("result: "+result);
-//        System.out.println(testClassName +" " +targetClass +" " +targetMethod);
         this.initialBranchCoverage = result.getBranchCoverageForTestClassAndClassNameMethodName(testClassName, targetClass, targetMethod);
         this.initialLineCoverage = result.getLineCoverageForTestClassAndClassNameMethodName(testClassName, targetClass, targetMethod);
-        new CloverExecutor().runMavenClean(absolutePathToProjectRoot);
-        return testsToBeAmplified;
     }
 
     @Override
@@ -111,17 +114,19 @@ public class BranchCoverageSelector extends TakeAllSelector {
         else {
             String[] splits = targetBranch.split(":");
             int branchLine = Integer.valueOf(splits[0]).intValue();
-            int symbol = targetBranch.contains("True") ? 0 : 1;
+            int symbol = targetBranch.contains("True") ? 1 : 0;
             for (CtMethod<?> ctMethod : amplifiedTestToBeKept) {
                 List<BranchCoverage> branchCoverageList = result.getBranchCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod);
                 if (symbol == 0) {
                     if (!(branchCoverageList==null) && branchCoverageList.stream().filter(branchCoverage -> branchCoverage.getRegion().getStartLine() == branchLine && branchCoverage.getFalseHitCount() > 0).findAny().isPresent()) {
                         methodsKept.add(ctMethod);
                         branchCoveragePerTestCase.put(ctMethod, branchCoverageList);
+                        lineCoveragePerPerTestCase.put(ctMethod, result.getLineCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod));
                     }
                 } else {
                     if (!(branchCoverageList==null) && branchCoverageList.stream().filter(branchCoverage -> branchCoverage.getRegion().getStartLine() == branchLine && branchCoverage.getTrueHitCount() > 0).findAny().isPresent()) {
                         methodsKept.add(ctMethod);
+                        branchCoveragePerTestCase.put(ctMethod, branchCoverageList);
                         lineCoveragePerPerTestCase.put(ctMethod, result.getLineCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod));
                     }
                 }
@@ -140,8 +145,7 @@ public class BranchCoverageSelector extends TakeAllSelector {
 
     private TestClassBranchCoverageJSON jsonReport() {
         TestClassBranchCoverageJSON testClassJSON;
-        testClassJSON = new TestClassBranchCoverageJSON(this.initialBranchCoverage, this.initialLineCoverage, this.branchCoveragePerTestCase,
-                this.lineCoveragePerPerTestCase);
+        testClassJSON = new TestClassBranchCoverageJSON(this.initialBranchCoverage, this.initialLineCoverage);
         this.selectedAmplifiedTest.stream()
                 .map(ctMethod -> new TestCaseBranchCoverageJSON(ctMethod.getSimpleName(),
                         Counter.getAssertionOfSinceOrigin(ctMethod),

@@ -101,7 +101,7 @@ public class CloverExecutor {
         setMavenHome();
         runGoals(
                 pathToRootOfProject,
-                "compile"
+                "test"
         );
     }
 
