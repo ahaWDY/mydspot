@@ -104,7 +104,7 @@ public class BranchCoverageSelector extends TakeAllSelector {
         if(targetBranch.equals("noBranch")){
             for (CtMethod<?> ctMethod : amplifiedTestToBeKept) {
                 List<LineCoverage> lineCoverageList = result.getLineCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod);
-                    if (!(lineCoverageList==null)){
+                    if (!(lineCoverageList==null) && !(lineCoverageList.size()==0)){
                         methodsKept.add(ctMethod);
                         lineCoveragePerPerTestCase.put(ctMethod, lineCoverageList);
                         branchCoveragePerTestCase.put(ctMethod, result.getBranchCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod));

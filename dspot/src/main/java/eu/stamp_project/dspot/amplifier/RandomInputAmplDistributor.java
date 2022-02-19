@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import eu.stamp_project.dspot.amplifier.amplifiers.TargetMethodAdderOnExistingObjectsAmplifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,9 +40,27 @@ public class RandomInputAmplDistributor extends AbstractInputAmplDistributor {
                 .flatMap(amplifier -> amplifier.amplify(test, i));
     }
 
+    /**
+     * Input amplification for a single test.
+     *
+     * @param test Test method
+     * @param i current iteration
+     * @param targetMethodName the method need test
+     * @return New generated tests
+     */
     protected Stream<CtMethod<?>> inputAmplifyTest(CtMethod<?> test, int i, String targetMethodName) {
-        return this.amplifiers.parallelStream()
-                .flatMap(amplifier -> amplifier.amplify(test, i, targetMethodName));
+        List<Amplifier> targetMethodAdderOnExistingObjectsAmplifier = this.amplifiers.stream().filter(amplifier -> amplifier instanceof TargetMethodAdderOnExistingObjectsAmplifier).collect(Collectors.toList());
+        List<Amplifier> otherAmplifiers = this.amplifiers.stream().filter(amplifier ->!(amplifier instanceof TargetMethodAdderOnExistingObjectsAmplifier)).collect(Collectors.toList());
+        if(targetMethodAdderOnExistingObjectsAmplifier.size()>0){
+            CtMethod<?> finalTest1 = test;
+            List<CtMethod<?>> addedMethods = targetMethodAdderOnExistingObjectsAmplifier.parallelStream().flatMap(amplifier -> amplifier.amplify(finalTest1, i, targetMethodName)).collect(Collectors.toList());
+           if(addedMethods!=null && addedMethods.size()>0){
+                test = addedMethods.get(0);
+           }
+        }
+        CtMethod<?> finalTest2 = test;
+        return otherAmplifiers.parallelStream()
+                .flatMap(amplifier -> amplifier.amplify(finalTest2, i, targetMethodName));
     }
 
     /**
@@ -64,7 +83,7 @@ public class RandomInputAmplDistributor extends AbstractInputAmplDistributor {
         return reduce(inputAmplifiedTests);
     }
 
-
+    @Override
     public List<CtMethod<?>> inputAmplify(List<CtMethod<?>> testMethods, int i, String targetMethodName){
         LOGGER.info("Amplification of inputs...");
         List<CtMethod<?>> inputAmplifiedTests = testMethods.parallelStream()
