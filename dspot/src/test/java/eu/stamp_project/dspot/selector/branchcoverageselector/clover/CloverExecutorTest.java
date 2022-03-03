@@ -10,10 +10,10 @@ public class CloverExecutorTest {
 
     @Test
     public void instrumentAndRunGivenTest() {
-        List<String> testBody = Arrays.asList("html", "hasValue");
-        Map<String, List<String>> test = new HashMap<String, List<String>>();
-        test.put("AttributeTest", testBody);
-//        new CloverExecutor().instrumentAndRunGivenTest("F:\\jsoup", test);
-        new CloverExecutor().instrumentAndRunGivenTestClass("F:\\jsoup","AttributeTest");
+//        List<String> testBody = Arrays.asList("html", "hasValue");
+//        Map<String, List<String>> test = new HashMap<String, List<String>>();
+//        test.put("AttributeTest", testBody);
+        new CloverExecutor().instrumentAndRunTest("F:\\javapoet");
+//        new CloverExecutor().instrumentAndRunGivenTestClass("F:\\jsoup","AttributeTest");
     }
 }

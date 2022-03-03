@@ -2,9 +2,13 @@ package eu.stamp_project.dspot.selector.branchcoverageselector.clover;
 
 import com.atlassian.clover.TestCaseInfoLookup;
 import com.atlassian.clover.reporters.html.HtmlReporter;
+import eu.stamp_project.dspot.selector.branchcoverageselector.Branch;
 import eu.stamp_project.dspot.selector.branchcoverageselector.Coverage;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * Created by Benjamin DANGLOT
@@ -20,6 +24,8 @@ public class CloverReader {
     private static final String REPORT_DIRECTORY = "/report/";
 
     public volatile static Coverage coverage;
+
+    public volatile static Set<String> branches = new ConcurrentSkipListSet<>();;
 
     /**
      * read the database initialize by {@link CloverExecutor}.
@@ -39,6 +45,11 @@ public class CloverReader {
 //                "--showlambda",
         });
         return coverage;
+    }
+
+    public Set<String> scan(String directory) {
+
+        return branches;
     }
 
 }

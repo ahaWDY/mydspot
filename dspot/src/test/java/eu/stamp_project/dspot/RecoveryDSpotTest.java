@@ -19,6 +19,7 @@ import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -90,7 +91,7 @@ public class RecoveryDSpotTest extends AbstractTestOnSample {
         }
 
         @Override
-        public List<CtMethod<?>> selectToKeep(List<CtMethod<?>> amplifiedTestToBeKept) {
+        public List<CtMethod<?>> selectToKeep(List<CtMethod<?>> amplifiedTestToBeKept) throws IOException {
             if (throwsToKeep) {
                 throw new RuntimeException();
             }

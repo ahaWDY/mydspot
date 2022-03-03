@@ -26,6 +26,8 @@ import spoon.reflect.declaration.CtNamedElement;
 import spoon.reflect.declaration.CtType;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
 
@@ -81,7 +83,7 @@ public class BranchCoverageSelector extends TakeAllSelector {
     }
 
     @Override
-    public List<CtMethod<?>> selectToKeep(List<CtMethod<?>> amplifiedTestToBeKept) {
+    public List<CtMethod<?>> selectToKeep(List<CtMethod<?>> amplifiedTestToBeKept) throws IOException {
         //compute the coverage
         final CtType<?> amplifiedTestClass = AmplificationHelper.createAmplifiedTest(amplifiedTestToBeKept, currentClassTestToBeAmplified);
         final String amplifiedClassName = AmplificationHelper.getAmplifiedName(amplifiedTestClass);
@@ -133,6 +135,8 @@ public class BranchCoverageSelector extends TakeAllSelector {
             }
         }
         this.selectedAmplifiedTest.addAll(methodsKept);
+
+        writeResult(amplifiedTestToBeKept.size(), methodsKept.size());
         return methodsKept;
     }
 
@@ -160,6 +164,15 @@ public class BranchCoverageSelector extends TakeAllSelector {
     private void deleteFile(String pathname){
         File file = new File(pathname);
         file.delete();
+    }
+
+    private void writeResult(int totalSize, int finalSize) throws IOException {
+        String file = "F:\\javapoet\\publicResultNormal.txt";  //存放数组数据的文件
+
+        FileWriter out = new FileWriter(file,true);  //文件写入流
+        out.write(totalSize+","+finalSize);
+        out.write("\n");
+        out.close();
     }
 
 }

@@ -8,6 +8,7 @@ import eu.stamp_project.dspot.common.report.output.selector.takeall.json.TestCla
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +44,7 @@ public class TakeAllSelector extends AbstractTestSelector {
 	}
 
 	@Override
-	public List<CtMethod<?>> selectToKeep(List<CtMethod<?>> amplifiedTestToBeKept) {
+	public List<CtMethod<?>> selectToKeep(List<CtMethod<?>> amplifiedTestToBeKept) throws IOException {
 		this.selectedAmplifiedTest.addAll(amplifiedTestToBeKept);
 		return amplifiedTestToBeKept;
 	}

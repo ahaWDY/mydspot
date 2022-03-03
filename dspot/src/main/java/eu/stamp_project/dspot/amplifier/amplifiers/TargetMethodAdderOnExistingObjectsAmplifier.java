@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class TargetMethodAdderOnExistingObjectsAmplifier implements Amplifier {
+
     @Override
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration) {
         return null;
@@ -22,6 +23,11 @@ public class TargetMethodAdderOnExistingObjectsAmplifier implements Amplifier {
 
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
         List<CtLocalVariable<?>> existingObjects = getExistingObjects(testMethod);
+        List<CtMethod<?>> targetMethods = AmplifierHelper.findTargetMethodWithTargetType(existingObjects.get(0).getType(), targetMethodName);
+        List<CtMethod<?>> validMethods =targetMethods.stream().filter(ctMethod ->
+                !MethodsHandler.isASupportedMethodName(ctMethod.getSimpleName())
+                        || (MethodsHandler.isASupportedMethodName(ctMethod.getSimpleName()) && !ctMethod.getParameters().isEmpty())
+        ).collect(Collectors.toList());
         return existingObjects.stream()
                 .flatMap(existingObject -> AmplifierHelper.findTargetMethodWithTargetType(existingObject.getType(), targetMethodName).stream()
                         .filter(ctMethod ->

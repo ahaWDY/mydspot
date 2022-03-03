@@ -4,6 +4,7 @@ import eu.stamp_project.dspot.common.report.output.selector.TestSelectorElementR
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -35,7 +36,7 @@ public interface TestSelector {
      * @param amplifiedTestToBeKept the list among which the selection is done.
      * @return selected amplified test methods to output
      */
-    List<CtMethod<?>> selectToKeep(List<CtMethod<?>> amplifiedTestToBeKept);
+    List<CtMethod<?>> selectToKeep(List<CtMethod<?>> amplifiedTestToBeKept) throws IOException;
 
     /**
      * this method should wrap up the result of the amplification according to the test criterion.

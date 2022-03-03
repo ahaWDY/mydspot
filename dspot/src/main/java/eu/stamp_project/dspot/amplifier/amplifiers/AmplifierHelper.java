@@ -63,20 +63,36 @@ public class AmplifierHelper {
         if (type == null || type.getTypeDeclaration() == null) {
             return Collections.emptyList();
         } else {
-            return type.getTypeDeclaration().getMethods().stream()
-                    .filter(method -> method.getSimpleName().equals(TargetMethodName))
+            Set<CtMethod<?>> allMethods = type.getTypeDeclaration().getMethods();
+            List<CtMethod<?>> targetMethods = allMethods.stream().filter(method -> method.getSimpleName().equals(TargetMethodName)).collect(Collectors.toList());
+            List<CtMethod<?>> modifierValidMethods = targetMethods.stream()
                     .filter(method -> method.getModifiers().contains(ModifierKind.PUBLIC)) // TODO checks this predicate
                     // TODO we could also access to method with default or protected modifiers
                     .filter(method -> !method.getModifiers().contains(ModifierKind.STATIC)) // TODO checks this predicate
                     // TODO we can't amplify test on full static classes with this predicate
-                    .filter(method -> !method.getModifiers().contains(ModifierKind.ABSTRACT)) // TODO checks this predicate
-                    // TODO maybe we would like to call of abstract method, since the abstract would be implemented
-                    // TODO inherited classes. However, the semantic of the test to be amplified may be to test the abstract class
+                    .filter(method -> !method.getModifiers().contains(ModifierKind.ABSTRACT))
+                    .collect(Collectors.toList());
+            List<CtMethod<?>> parameterValidMethods = modifierValidMethods.stream()
                     .filter(method -> method.getParameters()
-                            .stream()
-                            .map(CtParameter::getType)
-                            .allMatch(ValueCreatorHelper::canGenerateAValueForType)
-                    ).collect(Collectors.toList());
+                        .stream()
+                        .map(CtParameter::getType)
+                        .allMatch(ValueCreatorHelper::canGenerateAValueForType)
+                     ).collect(Collectors.toList());
+            return parameterValidMethods;
+//            return type.getTypeDeclaration().getMethods().stream()
+//                    .filter(method -> method.getSimpleName().equals(TargetMethodName))
+//                    .filter(method -> method.getModifiers().contains(ModifierKind.PUBLIC)) // TODO checks this predicate
+//                    // TODO we could also access to method with default or protected modifiers
+//                    .filter(method -> !method.getModifiers().contains(ModifierKind.STATIC)) // TODO checks this predicate
+//                    // TODO we can't amplify test on full static classes with this predicate
+//                    .filter(method -> !method.getModifiers().contains(ModifierKind.ABSTRACT)) // TODO checks this predicate
+//                    // TODO maybe we would like to call of abstract method, since the abstract would be implemented
+//                    // TODO inherited classes. However, the semantic of the test to be amplified may be to test the abstract class
+//                    .filter(method -> method.getParameters()
+//                            .stream()
+//                            .map(CtParameter::getType)
+//                            .allMatch(ValueCreatorHelper::canGenerateAValueForType)
+//                    ).collect(Collectors.toList());
         }
     }
 

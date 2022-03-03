@@ -27,6 +27,7 @@ import com.atlassian.clover.reporters.json.JSONException;
 import com.atlassian.clover.reporters.json.JSONObject;
 import com.atlassian.clover.reporters.util.CloverChartFactory;
 import com.atlassian.clover.util.CloverUtils;
+import eu.stamp_project.dspot.selector.branchcoverageselector.Branch;
 import eu.stamp_project.dspot.selector.branchcoverageselector.Region;
 import eu.stamp_project.dspot.selector.branchcoverageselector.clover.CloverReader;
 
@@ -240,11 +241,16 @@ public class RenderFileAction implements Callable {
                 public void visitBranch(BranchInfo info) {
                     int trueHitCount = info.getTrueHitCount();
                     int falseHitCount = info.getFalseHitCount();
+                    FullMethodInfo methodInfo = (FullMethodInfo) info.getParent();
+                    String methodName = methodInfo.getName();
                     if(trueHitCount>0 || falseHitCount>0) {
-                        FullMethodInfo methodInfo = (FullMethodInfo) info.getParent();
-                        String methodName = methodInfo.getName();
                         Region region = new Region(info.getStartLine(), info.getStartColumn(), info.getEndLine(), info.getEndColumn());
                         CloverReader.coverage.addBranchCoverage(testClassName, testName, className,methodName,region,trueHitCount, falseHitCount);
+                    }
+                    ArrayList<String> validClasses = newArrayList("AnnotationSpec", "TypeName","ClassName","CodeBlock","CodeWriter","FieldSpec","JavaFile","LineWrapper","MethodSpec","NameAllocator","ParameterSpec", "TypeSpec", "Util");
+                    if(validClasses.contains(className) && methodInfo.isPublic()) {
+                        CloverReader.branches.add(className+","+methodName.substring(0,methodName.indexOf("("))+","+info.getStartLine()+":True");
+                        CloverReader.branches.add(className+","+methodName.substring(0,methodName.indexOf("("))+","+info.getStartLine()+":False");
                     }
                     visitNode(info);
                 }
