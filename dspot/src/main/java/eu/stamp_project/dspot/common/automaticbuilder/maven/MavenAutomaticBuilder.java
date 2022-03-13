@@ -69,9 +69,9 @@ public class MavenAutomaticBuilder implements AutomaticBuilder {
                     "test",
                     "-DskipTests",
                     "dependency:build-classpath",
-                    "-Dmdep.outputFile=" + "target\\dspot\\classpath"
+                    "-Dmdep.outputFile=" + "target/dspot/classpath"
             );
-            final File classpathFile = new File(this.absolutePathToProjectRoot + "\\target\\dspot\\classpath");
+            final File classpathFile = new File(this.absolutePathToProjectRoot + "/target/dspot/classpath");
             try (BufferedReader buffer = new BufferedReader(new FileReader(classpathFile))) {
                 this.classpath = buffer.lines().collect(Collectors.joining());
             } catch (Exception e) {
@@ -111,11 +111,11 @@ public class MavenAutomaticBuilder implements AutomaticBuilder {
     public String buildClasspath() {
         if (this.classpath == null) {
             try {
-                final File classpathFile = new File(this.absolutePathToProjectRoot + "\\target\\dspot\\classpath");
+                final File classpathFile = new File(this.absolutePathToProjectRoot + "/target/dspot/classpath");
                 if (!classpathFile.exists()) {
                     this.runGoals(false,
                             "dependency:build-classpath",
-                            "-Dmdep.outputFile=" + "target\\dspot\\classpath"
+                            "-Dmdep.outputFile=" + "target/dspot/classpath"
                     );
                 }
                 try (BufferedReader buffer = new BufferedReader(new FileReader(classpathFile))) {
@@ -136,7 +136,7 @@ public class MavenAutomaticBuilder implements AutomaticBuilder {
     @Override
     public void runPit(CtType<?>... testClasses) {
         try {
-            FileUtils.deleteDirectory(new File(this.absolutePathToProjectRoot + "\\target\\pit-reports"));
+            FileUtils.deleteDirectory(new File(this.absolutePathToProjectRoot + "/target/pit-reports"));
         } catch (Exception ignored) {
 
         }
@@ -163,7 +163,7 @@ public class MavenAutomaticBuilder implements AutomaticBuilder {
     }
 
     private int runGoals(boolean specificPom, String... goals) {
-        final String pomPathname = this.absolutePathToProjectRoot + "\\" + (
+        final String pomPathname = this.absolutePathToProjectRoot + "/" + (
                 specificPom ? DSpotPOMCreator.getPOMName() : DSpotPOMCreator.POM_FILE);
         LOGGER.info("Using {} to run maven.", pomPathname);
         return _runGoals(specificPom, pomPathname, goals);
@@ -194,7 +194,7 @@ public class MavenAutomaticBuilder implements AutomaticBuilder {
         Invoker invoker = new DefaultInvoker();
         LOGGER.info("Using {} for maven home", mavenHome);
         invoker.setMavenHome(new File(mavenHome));
-        LOGGER.info(String.format("run maven: %s\\bin\\mvn %s", mavenHome, String.join(" ", goals)));
+        LOGGER.info(String.format("run maven: %s/bin/mvn %s", mavenHome, String.join(" ", goals)));
         if (DSpotState.verbose) {
             invoker.setOutputHandler(System.out::println);
             invoker.setErrorHandler(System.err::println);
