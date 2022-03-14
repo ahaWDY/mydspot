@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import static eu.stamp_project.dspot.common.report.error.ErrorEnum.ERROR_ASSERT_AMPLIFICATION;
@@ -238,6 +239,24 @@ public class DevFriendlyAmplification {
         LOGGER.info("Dev friendly amplification, path {}: {} test method(s) have been successfully amplified.",
                 path, improvingTests.size());
         return improvingTests;
+    }
+
+    public List<CtMethod<?>> limit(List<CtMethod<?>> tests, int maxNumTests) {
+        final List<CtMethod<?>> reducedTests = new ArrayList<>();
+
+        final int testsSize = tests.size();
+        if (testsSize > maxNumTests) {
+            Random random = new Random();
+            LOGGER.warn("Too many tests have been generated: {}", testsSize);
+            for (int i=0;i<maxNumTests; i++) {
+                reducedTests.add(tests.get(random.nextInt(testsSize)));
+            }
+            LOGGER.info("Number of generated test reduced to {}", reducedTests.size());
+        }
+        if (reducedTests.isEmpty()) {
+            reducedTests.addAll(tests);
+        }
+        return reducedTests;
     }
 
 }
