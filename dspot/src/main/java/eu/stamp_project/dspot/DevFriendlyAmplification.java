@@ -166,7 +166,10 @@ public class DevFriendlyAmplification {
             List<CtMethod<?>> amplifiedTestsWithAssertions = dSpotState.getAssertionGenerator()
                     .assertionAmplification(classWithTestMethods, inputAmplifiedTests);
 
-            amplifiedTests = amplifiedTestsWithAssertions;
+            amplifiedTests = limit(amplifiedTestsWithAssertions, 200);
+            if(amplifiedTests.isEmpty()){
+                amplifiedTests.addAll(inputAmplifiedTests);
+            }
             // add those without assertions (what if we do not have)
 //            amplifiedTests.addAll(inputAmplifiedTests);
 
